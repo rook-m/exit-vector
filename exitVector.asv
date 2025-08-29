@@ -3,25 +3,48 @@
 % gameInProgress is a variable that acts like an on/off switch for the
 % entire game. While gameInProgress = 1, the game will not stop.
 gameInProgress = 1;
-
+menuLoop = 1;
 % Begin Game
 while gameInProgress == 1
-% Display game title and main menu.
-fprintf("Exit Vector" + ...
-    "\n-----------\n");
-fprintf("Welcome to Exit Vector!\n" + ...
-    "Please interact with the menus by entering a number\n" + ...
-    "1) Play Game\n" + ...
-    "2) Options\n" + ...
-    "3) Quit\n");
-menuChoice = input("> ");
-
-if menuChoice == 1
-
-elseif menuChoice == 2
-
-elseif menuChoice == 3
-    fprintf("Thank you for playing! Goodbye.\n\n");
-    gameInProgress = 0;
+    % Set default game options
+    gameHeight = 10;
+    gameWidth = 10;
+    menuChoice = 0;
+    % Run through menu
+    while menuChoice == 0
+        fprintf("Exit Vector" + ...
+            "\n-----------\n");
+        fprintf("Welcome to Exit Vector!\n" + ...
+            "Please interact with the menus by entering a number\n" + ...
+            "1) Play Game\n" + ...
+            "2) Options\n" + ...
+            "3) Quit\n");
+        menuChoice = input("> ");
+        if menuChoice == 1
+            gameMap = mapGeneration(gameHeight,gameWidth);
+        elseif menuChoice == 2
+            fprintf("Options Loop")
+            menuChoice = 0
+        elseif menuChoice == 3
+            fprintf("Thank you for playing! Goodbye.\n\n");
+            gameInProgress = 0;
+        end
+    end
 end
+
+function [gameMap] = mapGeneration(gameHeight,gameWidth)
+    % MAPGENERATION Initialises the game map for two given parameters
+    % gameHeight and gameWidth.
+    % Intialise tile values and probabilities
+    emptyTile = 0;
+    startTile = 1;
+    escapeTile = 2;
+    enemyTile = 3;
+    enemyProbability = 0.0;
+    treasureTile = 4;
+    treasureProbability = 0.05;
+    trapTile = 5;
+    trapProbability = 0.05;
+
+    gameMap = zeros(gameHeight,gameWidth);
 end
