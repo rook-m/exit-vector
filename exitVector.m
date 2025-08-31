@@ -3,13 +3,12 @@
 % gameInProgress is a variable that acts like an on/off switch for the
 % entire game. While gameInProgress = 1, the game will not stop.
 gameInProgress = 1;
-menuLoop = 1;
+menuChoice = 0;
 % Begin Game
 while gameInProgress == 1
     % Set default game options
-    gameHeight = 10;
-    gameWidth = 10;
-    menuChoice = 0;
+    gameHeight = 100;
+    gameWidth = 100;
     % Run through menu
     while menuChoice == 0
         fprintf("Exit Vector" + ...
@@ -22,9 +21,13 @@ while gameInProgress == 1
         menuChoice = input("> ");
         if menuChoice == 1
             gameMap = mapGeneration(gameHeight,gameWidth);
+            disp(gameMap);
+
+            % Once finished playing
+            menuChoice = 0;
         elseif menuChoice == 2
             fprintf("Options Loop")
-            menuChoice = 0
+            menuChoice = 0;
         elseif menuChoice == 3
             fprintf("Thank you for playing! Goodbye.\n\n");
             gameInProgress = 0;
@@ -32,25 +35,78 @@ while gameInProgress == 1
     end
 end
 
-function [mapFinal] = mapGeneration(gameHeight,gameWidth)
+function [gameMap] = mapGeneration(gameHeight,gameWidth)
     % MAPGENERATION Initialises the game map for two given parameters
     % gameHeight and gameWidth.
     % Intialise tile values and probabilities
     emptyTile = 0;
     startTile = 1;
     escapeTile = 2;
-    wallTile = 3;
+    pathTile = 3;
+    wallTile = 4;
     wallProbability = 0.2;
-    enemyTile = 4;
+    enemyTile = 5;
     enemyProbability = 0.05;
-    treasureTile = 5;
+    treasureTile = 6;
     treasureProbability = 0.05;
-    trapTile = 6;
+    trapTile = 7;
     trapProbability = 0.05;
     % Generate map in stages (stage number representing the type of tile
-    % being masked over the previous map).
-    mapStageZero = zeros(gameHeight,gameWidth);
-
-    % Final generated map.
-    mapFinal = 0;
+    % being masked over the previous map)
+    % Stage Zero
+    gameMap = zeros(gameHeight,gameWidth);
+    % Generate and place startTile on random tile of the map matrix
+    startRow = randi(gameHeight);
+    startCol = randi(gameWidth);
+    gameMap(startRow,startCol) = startTile;
+    % Begin escape generation
+    escapeGeneration = 1;
+    while escapeGeneration == 1
+        % Generate possible escape tile
+        escapeRow = randi(gameHeight);
+        escapeCol = randi(gameWidth);
+        % Check that generated tile is not the start tile
+        if escapeRow ~= startRow || escapeCol ~= startCol
+            % Place escape tile
+            gameMap(escapeRow, escapeCol) = escapeTile;
+            escapeGeneration = 0;
+        end % End conditional
+    end % End escape generation loop
+    % Begin path generation. (This ensure that there IS always a guaranteed
+    % path to the exit. At the end, any empty tiles are automatically
+    % converted to paths.
+    pathGeneration = 1;
+    lastPathRow = startRow;
+    lastPathCol = startCol;
+    while pathGeneration == 1
+        % Generate new path tile.
+        pathDirection = randi(4);
+        switch pathDirection
+            case 1 % Up
+                pathRow = lastPathRow + 1;
+                pathCol = lastPathCol;
+            case 2 % Down
+                pathRow = lastPathRow - 1;
+                pathCol = lastPathCol;                   
+            case 3 % Left
+                pathRow = lastPathRow;
+                pathCol = lastPathCol - 1;
+            case 4 % Right
+                pathRow = lastPathRow;
+                pathCol = lastPathCol + 1;
+        end
+        % Check new path is within bounds.
+        if pathRow > 0 && pathRow < gameHeight+1 && pathCol > 0 && pathCol < gameWidth+1
+        % Path is valid
+        % Check new path is empty
+            if gameMap(pathRow, pathCol) == emptyTile
+                gameMap(pathRow, pathCol) = pathTile; % Assign path tile
+                lastPathRow = pathRow;
+                lastPathCol = pathCol;
+            elseif gameMap(pathRow, pathCol) == escapeTile
+                % End path generation
+                pathGeneration = 0;
+            end
+        end
+    end % End path generation
 end
